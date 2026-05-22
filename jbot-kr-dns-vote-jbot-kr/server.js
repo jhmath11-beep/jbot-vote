@@ -224,7 +224,10 @@ async function handleApi(req, res) {
         return json(res, 400, { ok: false, error: "too many choices" });
       }
       const maxChoices = section.multiple ? Number(section.maxChoices || section.choices.length) : 1;
-      if (answer.choices.length > maxChoices) {
+      if ((section.choiceLimitMode || "max") === "exact" && answer.choices.length !== maxChoices) {
+        return json(res, 400, { ok: false, error: "wrong choice count" });
+      }
+      if ((section.choiceLimitMode || "max") === "max" && answer.choices.length > maxChoices) {
         return json(res, 400, { ok: false, error: "too many choices" });
       }
       const allowed = new Set(section.choices || []);
