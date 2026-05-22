@@ -924,9 +924,9 @@
           ${!showVoteButton && usedLabels ? `<p class="muted">참여 확인: ${usedLabels}</p>` : ""}
           <div class="row" style="margin-top: 12px;">
             ${showVoteButton ? `<button onclick="startVote('${election.id}')">투표하기</button>` : ""}
-            <button class="secondary" onclick="openResults('${election.id}')">결과 보기</button>
+            ${!showVoteButton ? `<button class="secondary" onclick="openResults('${election.id}')">결과 보기</button>` : ""}
             ${!showVoteButton ? `<button class="secondary" onclick="editElection('${election.id}')">수정</button>` : ""}
-            <button class="danger" onclick="deleteElection('${election.id}')">삭제</button>
+            ${!showVoteButton ? `<button class="danger" onclick="deleteElection('${election.id}')">삭제</button>` : ""}
           </div>
           ${!showVoteButton ? `
             <div class="linkbox">
@@ -960,6 +960,7 @@
         id: uid("section"),
         title: "투표 항목",
         multiple: false,
+        choiceLimitMode: "max",
         maxChoices: 1,
         choices: ["선택지 1", "선택지 2"]
       };
@@ -980,6 +981,12 @@
             </label>
             <label>최대 선택 개수
               <input type="number" min="1" max="${Math.max(section.choices.length, 1)}" value="${section.multiple ? (section.maxChoices || section.choices.length) : 1}" ${section.multiple ? "" : "disabled"} onchange="updateSection('${section.id}', 'maxChoices', Number(this.value) || 1)" />
+            </label>
+            <label>복수 선택 규칙
+              <select ${section.multiple ? "" : "disabled"} onchange="updateSection('${section.id}', 'choiceLimitMode', this.value)">
+                <option value="max" ${(section.choiceLimitMode || "max") === "max" ? "selected" : ""}>최대 개수까지 선택</option>
+                <option value="exact" ${section.choiceLimitMode === "exact" ? "selected" : ""}>정확히 개수만큼 선택</option>
+              </select>
             </label>
           </div>
           <div style="margin-top: 10px;">
@@ -1005,6 +1012,7 @@
       section[key] = value;
       if (key === "multiple") {
         section.maxChoices = value ? Math.min(section.maxChoices || section.choices.length, section.choices.length) : 1;
+        section.choiceLimitMode = value ? (section.choiceLimitMode || "max") : "max";
         renderSectionEditor();
       }
     };
@@ -1081,7 +1089,7 @@
         ${election.sections.map((section) => `
           <div class="section-box">
             <h3>${escapeHtml(section.title)}</h3>
-            <p class="muted">${section.multiple ? `최대 ${section.maxChoices || section.choices.length}개까지 선택할 수 있습니다.` : "하나만 선택하세요."}</p>
+            <p class="muted">${choiceRuleText(section)}</p>
             <div class="choice-list">
               ${section.choices.map((choice) => `
                 <label class="choice-option">
@@ -1098,6 +1106,14 @@
       `;
     }
 
+    function choiceRuleText(section) {
+      if (!section.multiple) return "하나만 선택하세요.";
+      const count = section.maxChoices || section.choices.length;
+      return (section.choiceLimitMode || "max") === "exact"
+        ? `정확히 ${count}개를 선택해야 합니다.`
+        : `최대 ${count}개까지 선택할 수 있습니다.`;
+    }
+
     async function submitVote(event) {
       event.preventDefault();
       const election = state.elections.find((item) => item.id === activeElectionId);
@@ -1111,7 +1127,12 @@
         const checked = $$(`input[name="${section.id}"]:checked`).map((input) => input.value);
         if (!checked.length) return alert(`'${section.title}' 항목을 선택하세요.`);
         const maxChoices = section.multiple ? (section.maxChoices || section.choices.length) : 1;
-        if (checked.length > maxChoices) return alert(`'${section.title}' 항목은 최대 ${maxChoices}개까지 선택할 수 있습니다.`);
+        if ((section.choiceLimitMode || "max") === "exact" && checked.length !== maxChoices) {
+          return alert(`'${section.title}' 항목은 정확히 ${maxChoices}개를 선택해야 합니다.`);
+        }
+        if ((section.choiceLimitMode || "max") === "max" && checked.length > maxChoices) {
+          return alert(`'${section.title}' 항목은 최대 ${maxChoices}개까지 선택할 수 있습니다.`);
+        }
         answers.push({ sectionId: section.id, choices: checked });
       }
 
@@ -1275,6 +1296,7 @@
         id: section.id,
         title: section.title,
         multiple: section.multiple,
+        choiceLimitMode: section.choiceLimitMode || "max",
         maxChoices: section.multiple ? (section.maxChoices || section.choices.length) : 1,
         choices: [...section.choices]
       }));
@@ -1399,6 +1421,7 @@
         ...section,
         title: section.title.trim() || "투표 항목",
         choices: section.choices.map((choice) => choice.trim()).filter(Boolean),
+        choiceLimitMode: section.multiple ? (section.choiceLimitMode || "max") : "max",
         maxChoices: section.multiple ? Math.max(1, Math.min(Number(section.maxChoices) || section.choices.length, section.choices.length)) : 1
       }));
       if (cleanSections.some((section) => !section.choices.length)) {
@@ -1568,8 +1591,8 @@
         repeatMode: "blocked",
         tokenLabelMode: "keep",
         sections: [
-          { id: uid("section"), title: "가장 우선하면 좋을 학교생활 개선안", multiple: false, maxChoices: 1, choices: ["급식 만족도 개선", "체육활동 확대", "자습 공간 개선"] },
-          { id: uid("section"), title: "함께 추진하면 좋은 행사", multiple: true, maxChoices: 2, choices: ["학급 대항전", "진로 체험 부스", "작은 음악회"] }
+          { id: uid("section"), title: "가장 우선하면 좋을 학교생활 개선안", multiple: false, choiceLimitMode: "max", maxChoices: 1, choices: ["급식 만족도 개선", "체육활동 확대", "자습 공간 개선"] },
+          { id: uid("section"), title: "함께 추진하면 좋은 행사", multiple: true, choiceLimitMode: "max", maxChoices: 2, choices: ["학급 대항전", "진로 체험 부스", "작은 음악회"] }
         ],
         tokens,
         ballots: []
