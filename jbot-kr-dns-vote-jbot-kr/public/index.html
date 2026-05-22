@@ -1,0 +1,1599 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JBOT 학교 전자투표</title>
+  <style>
+    :root {
+      --ink: #17202a;
+      --muted: #607080;
+      --line: #d9e1e8;
+      --bg: #f4f7f9;
+      --panel: #ffffff;
+      --blue: #1463c2;
+      --blue-dark: #0d4c96;
+      --green: #13875a;
+      --red: #c33232;
+      --amber: #a86800;
+      --shadow: 0 14px 40px rgba(24, 45, 69, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      letter-spacing: 0;
+    }
+
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .topbar {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 220px;
+    }
+
+    .mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: #163f6f;
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .brand strong {
+      display: block;
+      font-size: 18px;
+    }
+
+    .brand span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      border-radius: 7px;
+      background: var(--blue);
+      color: #fff;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 700;
+      min-height: 40px;
+    }
+
+    button:hover {
+      background: var(--blue-dark);
+    }
+
+    button.secondary {
+      background: #e7edf3;
+      color: #1e3348;
+    }
+
+    button.secondary:hover {
+      background: #d7e1ea;
+    }
+
+    button.danger {
+      background: var(--red);
+    }
+
+    button.ghost {
+      background: transparent;
+      color: #1e3348;
+      border: 1px solid var(--line);
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px 20px 42px;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .intro {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      align-items: stretch;
+      margin-bottom: 18px;
+    }
+
+    .hero, .panel, .item {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 28px;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: 32px;
+      line-height: 1.25;
+    }
+
+    .hero p, .panel p {
+      color: var(--muted);
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .status-panel {
+      padding: 22px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 10px;
+    }
+
+    .stat:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .stat span {
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .panel {
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .panel h2, .panel h3 {
+      margin: 0 0 14px;
+      line-height: 1.35;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: #24384b;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #cbd6e0;
+      border-radius: 7px;
+      padding: 10px 11px;
+      background: #fff;
+      color: var(--ink);
+      min-height: 41px;
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .between {
+      justify-content: space-between;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .notice {
+      background: #eef6ff;
+      color: #17436d;
+      border: 1px solid #c6def5;
+      padding: 12px 14px;
+      border-radius: 8px;
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .warning {
+      background: #fff8e8;
+      color: #714800;
+      border-color: #f1d59a;
+    }
+
+    .list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .item {
+      padding: 16px;
+    }
+
+    .item h3 {
+      margin: 0 0 8px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      background: #edf2f7;
+      color: #2c4054;
+    }
+
+    .badge.open {
+      background: #e5f6ee;
+      color: #0d6a44;
+    }
+
+    .badge.closed {
+      background: #f8e8e8;
+      color: #9b2020;
+    }
+
+    .choice-list {
+      display: grid;
+      gap: 8px;
+      margin: 10px 0;
+    }
+
+    .choice-option {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fbfcfd;
+      font-weight: 600;
+    }
+
+    .choice-option input {
+      width: auto;
+      min-height: auto;
+    }
+
+    .section-box {
+      border: 1px solid var(--line);
+      background: #fbfcfd;
+      border-radius: 8px;
+      padding: 14px;
+      margin-top: 12px;
+    }
+
+    .choice-editor {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    .results-table th, .results-table td {
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      padding: 10px;
+      vertical-align: middle;
+    }
+
+    .bar {
+      height: 13px;
+      background: #dfe8f1;
+      border-radius: 99px;
+      overflow: hidden;
+      min-width: 110px;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      background: var(--green);
+      border-radius: inherit;
+    }
+
+    .linkbox {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .linkbox input {
+      color: var(--muted);
+      background: #f7fafc;
+    }
+
+    .locked {
+      display: none;
+    }
+
+    .locked.active {
+      display: block;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      background: #ffffff;
+      color: var(--muted);
+    }
+
+    .footer-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px 20px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .print-only {
+      display: none;
+    }
+
+    @media (max-width: 760px) {
+      .topbar, .intro, .grid, .fields {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar {
+        display: grid;
+      }
+
+      nav {
+        justify-content: flex-start;
+      }
+
+      .hero h1 {
+        font-size: 25px;
+      }
+
+      .choice-editor {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      @page {
+        size: A4;
+        margin: 9mm;
+      }
+
+      body {
+        background: #fff;
+        font-size: 9px;
+      }
+
+      header, footer, .no-print, #home, #admin, #vote {
+        display: none !important;
+      }
+
+      main {
+        padding: 0;
+        max-width: none;
+      }
+
+      #results {
+        display: block !important;
+      }
+
+      .panel {
+        box-shadow: none;
+        border: 0;
+        padding: 0;
+        margin: 0 0 6px;
+      }
+
+      .print-only {
+        display: block;
+      }
+
+      .print-only h1 {
+        margin: 0 0 5px;
+        font-size: 15px;
+        line-height: 1.2;
+      }
+
+      #resultContent h3 {
+        margin: 3px 0;
+        font-size: 11px;
+        line-height: 1.2;
+      }
+
+      #resultContent p {
+        margin: 0 0 4px;
+        font-size: 8px;
+        line-height: 1.25;
+      }
+
+      #resultContent .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 4px;
+        margin-bottom: 4px;
+      }
+
+      #resultContent .item {
+        box-shadow: none;
+        border: 1px solid #d7d7d7;
+        padding: 4px 6px;
+        border-radius: 3px;
+      }
+
+      #resultContent .item p {
+        margin: 1px 0 0;
+      }
+
+      #resultContent .section-box {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        border: 1px solid #d7d7d7;
+        border-radius: 3px;
+        padding: 4px;
+        margin: 0 0 4px;
+        background: #fff;
+      }
+
+      .results-table {
+        table-layout: fixed;
+        margin-top: 2px;
+        font-size: 7.4px;
+        line-height: 1.08;
+      }
+
+      .results-table th,
+      .results-table td {
+        padding: 2px 3px;
+        border-bottom: 1px solid #e2e2e2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .results-table th:nth-child(1),
+      .results-table td:nth-child(1) {
+        width: 8%;
+        text-align: center;
+      }
+
+      .results-table th:nth-child(2),
+      .results-table td:nth-child(2) {
+        width: 48%;
+      }
+
+      .results-table th:nth-child(3),
+      .results-table td:nth-child(3),
+      .results-table th:nth-child(4),
+      .results-table td:nth-child(4) {
+        width: 10%;
+        text-align: right;
+      }
+
+      .results-table th:nth-child(5),
+      .results-table td:nth-child(5) {
+        width: 24%;
+      }
+
+      .bar {
+        height: 5px;
+        min-width: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <div class="mark">J</div>
+        <div>
+          <strong>JBOT 학교 전자투표</strong>
+          <span>vote.jbot.kr 운영 초안</span>
+        </div>
+      </div>
+      <nav>
+        <button class="secondary" data-view="home">투표 목록</button>
+        <button class="secondary" data-view="admin">관리자</button>
+        <button class="secondary" data-view="results">결과</button>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section id="home" class="section active">
+      <div class="intro">
+        <div class="hero">
+          <h1>우리 학교 전용 온라인 전자투표</h1>
+          <p>관리자가 투표를 만들고 링크로 공유하면, 참여자는 열려 있는 투표를 선택해 간단히 투표할 수 있습니다. 무기명 투표는 투표권 확인 정보와 선택 내용을 분리하는 방향으로 설계했습니다.</p>
+        </div>
+        <div class="status-panel panel">
+          <div class="stat"><span>전체 투표</span><strong id="statTotal">0개</strong></div>
+          <div class="stat"><span>진행 중</span><strong id="statOpen">0개</strong></div>
+          <div class="stat"><span>저장 방식</span><strong id="storageMode">서버 파일 저장</strong></div>
+        </div>
+      </div>
+
+      <div class="notice warning">
+        이 첫 버전은 화면과 업무 흐름을 확인하기 위한 시제품입니다. 실제 운영 시에는 서버, 관리자 로그인, HTTPS, 백업, 개인정보 처리 방침을 붙여야 합니다.
+      </div>
+
+      <div class="panel">
+        <div class="row between">
+          <h2>열려 있는 투표</h2>
+          <button class="ghost no-print" id="seedDemoBtn">예시 투표 만들기</button>
+        </div>
+        <div id="electionList" class="list"></div>
+      </div>
+    </section>
+
+    <section id="admin" class="section">
+      <div id="adminLock" class="panel locked">
+        <h2>관리자 확인</h2>
+        <p class="muted">시제품용 간단 잠금입니다. 실제 서버형에서는 관리자 계정 로그인으로 바꿔야 합니다.</p>
+        <div class="fields" style="margin-top: 14px;">
+          <label>관리자 비밀번호
+            <input id="adminPasswordInput" type="password" placeholder="초기 비밀번호: jbot2026" />
+          </label>
+        </div>
+        <div class="row" style="margin-top: 14px;">
+          <button type="button" id="adminLoginBtn">관리자 열기</button>
+        </div>
+      </div>
+
+      <div id="adminContent">
+      <div class="panel">
+        <h2>관리자: 투표 만들기</h2>
+        <div class="notice">
+          중복투표 방지가 필요한 경우 투표권 코드를 한 줄에 하나씩 입력하세요. 무기명 투표에서는 이름을 받지 않고, 코드 사용 여부만 따로 확인하는 구조로 잡았습니다.
+        </div>
+        <form id="electionForm">
+          <div class="fields">
+            <label class="full">투표 제목
+              <input id="titleInput" required placeholder="예: 2026 학생회장 선거" />
+            </label>
+            <label>시작 일시
+              <input id="startInput" type="datetime-local" required />
+            </label>
+            <label>종료 일시
+              <input id="endInput" type="datetime-local" required />
+            </label>
+            <label>투표 방식
+              <select id="identityMode">
+                <option value="anonymous">무기명</option>
+                <option value="named">유기명</option>
+              </select>
+            </label>
+            <label>중복투표
+              <select id="repeatMode">
+                <option value="blocked">불허</option>
+                <option value="allowed">허용</option>
+              </select>
+            </label>
+            <label>참여 여부 확인
+              <select id="tokenLabelMode">
+                <option value="keep">코드명으로 확인</option>
+                <option value="hide">코드명 저장 안 함</option>
+              </select>
+            </label>
+            <label class="full">투표권 코드
+              <textarea id="tokenInput" placeholder="중복투표를 막을 때 사용합니다. 예: 1학년1반01&#10;1학년1반02&#10;1학년1반03"></textarea>
+            </label>
+          </div>
+          <div class="section-box">
+            <h3>투표권 코드 입력/자동 생성</h3>
+            <p class="muted">직접 입력하면 김준홍8503 같은 학교 내부 코드도 사용할 수 있고, 자동 생성하면 이름 없는 무작위 코드를 만들 수 있습니다. 참여 여부 확인은 투표 내용과 분리됩니다.</p>
+            <div class="fields" style="margin-top: 10px;">
+              <label>생성 개수
+                <input id="tokenCountInput" type="number" min="1" max="500" value="50" />
+              </label>
+              <label>코드 앞글자
+                <input id="tokenPrefixInput" value="JBOT" maxlength="12" />
+              </label>
+            </div>
+            <div class="row" style="margin-top: 12px;">
+              <button type="button" class="secondary" id="generateTokensBtn">코드 자동 생성</button>
+              <button type="button" class="ghost" id="downloadTokensBtn">코드 명단 저장</button>
+              <button type="button" class="ghost" id="importTokensBtn">CSV/TXT 불러오기</button>
+              <input id="tokenFileInput" type="file" accept=".csv,.txt,text/csv,text/plain" hidden />
+            </div>
+          </div>
+
+          <div class="row between" style="margin-top: 18px;">
+            <h3>투표 항목</h3>
+            <button type="button" class="secondary" id="addSectionBtn">항목 추가</button>
+          </div>
+          <div id="sectionEditor"></div>
+
+          <div class="row" style="margin-top: 18px;">
+            <button type="submit" id="saveElectionBtn">투표 저장</button>
+            <button type="button" class="secondary" id="cancelEditBtn" hidden>수정 취소</button>
+            <button type="button" class="secondary" id="resetBtn">전체 초기화</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h2>관리자 비밀번호 변경</h2>
+        <div class="fields">
+          <label>현재 비밀번호
+            <input id="currentAdminPassword" type="password" />
+          </label>
+          <label>새 비밀번호
+            <input id="newAdminPassword" type="password" minlength="4" />
+          </label>
+        </div>
+        <div class="row" style="margin-top: 14px;">
+          <button type="button" class="secondary" id="changePasswordBtn">비밀번호 변경</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="row between">
+          <h2>관리 중인 투표</h2>
+          <div class="row">
+            <button type="button" class="ghost" id="backupBtn">전체 백업</button>
+            <button type="button" class="ghost" id="restoreBtn">백업 불러오기</button>
+            <input id="restoreInput" type="file" accept="application/json" hidden />
+          </div>
+        </div>
+        <div id="adminList" class="list"></div>
+      </div>
+      </div>
+    </section>
+
+    <section id="vote" class="section">
+      <div class="panel">
+        <div class="row between">
+          <h2 id="voteTitle">투표</h2>
+          <button class="secondary no-print" data-view="home">목록으로</button>
+        </div>
+        <p id="voteMeta" class="muted"></p>
+      </div>
+      <form id="voteForm" class="panel"></form>
+    </section>
+
+    <section id="results" class="section">
+      <div class="panel">
+        <div class="print-only">
+          <h1>JBOT 학교 전자투표 결과 보고서</h1>
+        </div>
+        <div class="row between no-print">
+          <h2>투표 결과</h2>
+          <div class="row">
+            <select id="resultSelect" aria-label="결과를 볼 투표 선택"></select>
+            <button class="secondary" id="csvBtn">CSV 저장</button>
+            <button class="secondary" id="printBtn">A4 출력/PDF 저장</button>
+          </div>
+        </div>
+        <div id="resultContent"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <strong>저작권 안내</strong><br />
+      Copyright © 2026 JBOT. All rights reserved. 본 페이지와 투표 시스템의 화면 구성, 문구, 코드 및 운영 자료는 학교 내부 전자투표 운영 목적으로만 사용할 수 있으며, 무단 복제·배포·상업적 이용을 금합니다.
+      <br /><br />
+      <strong>개인정보 및 무기명 투표 안내</strong><br />
+      무기명 투표에서 투표권 코드는 참여 여부와 중복투표 확인을 위해서만 사용되며, 투표 선택 내용과 함께 저장되지 않도록 설계되어 있습니다. 유기명 투표는 관리자가 설정한 목적에 따라 이름과 제출 시간이 결과 확인용으로 저장될 수 있습니다.
+    </div>
+  </footer>
+
+  <script>
+    const STORE_KEY = "jbotVotePrototype";
+    const ADMIN_PASSWORD_KEY = "jbotAdminPassword";
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+
+    let state = loadState();
+    let editingSections = [];
+    let activeElectionId = null;
+    let editingElectionId = null;
+    let adminUnlocked = sessionStorage.getItem("jbotAdminUnlocked") === "true";
+    let adminPasswordSession = sessionStorage.getItem("jbotAdminPasswordSession") || "";
+
+    function loadState() {
+      try {
+        return JSON.parse(localStorage.getItem(STORE_KEY)) || { elections: [] };
+      } catch {
+        return { elections: [] };
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORE_KEY, JSON.stringify(state));
+      if (location.protocol !== "file:") {
+        if (!adminPasswordSession) return;
+        fetch("/api/admin/state", {
+          method: "POST",
+          headers: adminHeaders(),
+          body: JSON.stringify(state)
+        }).catch(() => {
+          console.warn("서버 저장에 실패했습니다.");
+        });
+      }
+    }
+
+    async function loadServerState() {
+      if (location.protocol === "file:") return;
+      try {
+        const response = adminUnlocked && adminPasswordSession
+          ? await fetch("/api/admin/state", { cache: "no-store", headers: adminHeaders(false) })
+          : await fetch("/api/public/elections", { cache: "no-store" });
+        if (!response.ok) throw new Error("state load failed");
+        state = await response.json();
+        localStorage.setItem(STORE_KEY, JSON.stringify(state));
+        renderHome();
+        renderAdmin();
+        renderResults();
+        routeFromHash();
+      } catch {
+        console.warn("서버 데이터를 불러오지 못했습니다. 브라우저 임시 데이터를 사용합니다.");
+      }
+    }
+
+    function adminHeaders(includeJson = true) {
+      const headers = { "X-Admin-Password": adminPasswordSession };
+      if (includeJson) headers["Content-Type"] = "application/json";
+      return headers;
+    }
+
+    async function digest(text) {
+      const data = new TextEncoder().encode(text.trim());
+      const hash = await crypto.subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(hash)).map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    function uid(prefix) {
+      return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+    }
+
+    function formatDate(value) {
+      if (!value) return "";
+      return new Date(value).toLocaleString("ko-KR", { dateStyle: "medium", timeStyle: "short" });
+    }
+
+    function makeShareUrl(electionId) {
+      const base = location.href.split("#")[0];
+      return `${base}#vote=${encodeURIComponent(electionId)}`;
+    }
+
+    function downloadText(filename, text, type = "text/plain;charset=utf-8") {
+      const blob = new Blob(["\ufeff", text], { type });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function csvCell(value) {
+      return `"${String(value ?? "").replace(/"/g, '""')}"`;
+    }
+
+    function randomToken(prefix) {
+      const letters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+      const bytes = new Uint8Array(8);
+      crypto.getRandomValues(bytes);
+      const body = Array.from(bytes).map((byte) => letters[byte % letters.length]).join("");
+      return `${prefix}-${body.slice(0, 4)}-${body.slice(4)}`;
+    }
+
+    function getAdminPassword() {
+      return localStorage.getItem(ADMIN_PASSWORD_KEY) || "jbot2026";
+    }
+
+    function electionStatus(election) {
+      const now = Date.now();
+      const start = new Date(election.startAt).getTime();
+      const end = new Date(election.endAt).getTime();
+      if (now < start) return { label: "예정", className: "" };
+      if (now > end) return { label: "종료", className: "closed" };
+      return { label: "진행 중", className: "open" };
+    }
+
+    function isOpen(election) {
+      return electionStatus(election).label === "진행 중";
+    }
+
+    function showView(id) {
+      $$(".section").forEach((section) => section.classList.toggle("active", section.id === id));
+      if (id === "home") renderHome();
+      if (id === "admin") renderAdmin();
+      if (id === "results") renderResults();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderAdminLock() {
+      $("#adminLock").classList.toggle("active", !adminUnlocked);
+      $("#adminContent").style.display = adminUnlocked ? "block" : "none";
+    }
+
+    function renderHome() {
+      $("#statTotal").textContent = `${state.elections.length}개`;
+      $("#statOpen").textContent = `${state.elections.filter(isOpen).length}개`;
+      $("#storageMode").textContent = location.protocol === "file:" ? "브라우저 임시 저장" : "서버 파일 저장";
+      $("#seedDemoBtn").style.display = location.protocol === "file:" || adminUnlocked ? "inline-flex" : "none";
+      const list = $("#electionList");
+      const openElections = state.elections.filter(isOpen);
+      if (!openElections.length) {
+        list.innerHTML = `<div class="item"><h3>현재 진행 중인 투표가 없습니다.</h3><p class="muted">관리자 화면에서 새 투표를 만들거나 예시 투표를 생성해 확인해 보세요.</p></div>`;
+        return;
+      }
+      list.innerHTML = openElections.map((election) => electionCard(election, true)).join("");
+    }
+
+    function electionCard(election, showVoteButton) {
+      const status = electionStatus(election);
+      const shareUrl = makeShareUrl(election.id);
+      const usedTokens = (election.tokens || []).filter((token) => token.used);
+      const participationText = election.repeatMode === "blocked"
+        ? ` · 참여 ${usedTokens.length}/${(election.tokens || []).length}명`
+        : "";
+      const usedLabels = usedTokens
+        .map((token) => token.label)
+        .filter(Boolean)
+        .map(escapeHtml)
+        .join(", ");
+      return `
+        <article class="item">
+          <div class="row between">
+            <h3>${escapeHtml(election.title)}</h3>
+            <span class="badge ${status.className}">${status.label}</span>
+          </div>
+          <p class="muted">${formatDate(election.startAt)} ~ ${formatDate(election.endAt)}</p>
+          <p class="muted">${election.identityMode === "anonymous" ? "무기명" : "유기명"} · 중복투표 ${election.repeatMode === "allowed" ? "허용" : "불허"} · 항목 ${election.sections.length}개${participationText}</p>
+          ${!showVoteButton && usedLabels ? `<p class="muted">참여 확인: ${usedLabels}</p>` : ""}
+          <div class="row" style="margin-top: 12px;">
+            ${showVoteButton ? `<button onclick="startVote('${election.id}')">투표하기</button>` : ""}
+            <button class="secondary" onclick="openResults('${election.id}')">결과 보기</button>
+            ${!showVoteButton ? `<button class="secondary" onclick="editElection('${election.id}')">수정</button>` : ""}
+            <button class="danger" onclick="deleteElection('${election.id}')">삭제</button>
+          </div>
+          ${!showVoteButton ? `
+            <div class="linkbox">
+              <input readonly value="${escapeAttr(shareUrl)}" aria-label="공유 링크" />
+              <button class="ghost" onclick="copyShareLink('${election.id}')">링크 복사</button>
+            </div>
+          ` : ""}
+        </article>
+      `;
+    }
+
+    function renderAdmin() {
+      renderAdminLock();
+      if (!adminUnlocked) return;
+      if (!editingSections.length) {
+        editingSections = [newSection()];
+      }
+      $("#saveElectionBtn").textContent = editingElectionId ? "수정 저장" : "투표 저장";
+      $("#cancelEditBtn").hidden = !editingElectionId;
+      renderSectionEditor();
+      const adminList = $("#adminList");
+      if (!state.elections.length) {
+        adminList.innerHTML = `<div class="item"><h3>아직 저장된 투표가 없습니다.</h3><p class="muted">위 양식에서 첫 투표를 만들어 보세요.</p></div>`;
+      } else {
+        adminList.innerHTML = state.elections.map((election) => electionCard(election, false)).join("");
+      }
+    }
+
+    function newSection() {
+      return {
+        id: uid("section"),
+        title: "투표 항목",
+        multiple: false,
+        choices: ["선택지 1", "선택지 2"]
+      };
+    }
+
+    function renderSectionEditor() {
+      $("#sectionEditor").innerHTML = editingSections.map((section, index) => `
+        <div class="section-box">
+          <div class="fields">
+            <label>항목 제목
+              <input value="${escapeAttr(section.title)}" onchange="updateSection('${section.id}', 'title', this.value)" />
+            </label>
+            <label>선택 방식
+              <select onchange="updateSection('${section.id}', 'multiple', this.value === 'true')">
+                <option value="false" ${!section.multiple ? "selected" : ""}>하나만 선택</option>
+                <option value="true" ${section.multiple ? "selected" : ""}>여러 개 선택 가능</option>
+              </select>
+            </label>
+          </div>
+          <div style="margin-top: 10px;">
+            <strong>선택지</strong>
+            ${section.choices.map((choice, choiceIndex) => `
+              <div class="choice-editor">
+                <input value="${escapeAttr(choice)}" onchange="updateChoice('${section.id}', ${choiceIndex}, this.value)" />
+                <button type="button" class="ghost" onclick="removeChoice('${section.id}', ${choiceIndex})">삭제</button>
+              </div>
+            `).join("")}
+            <div class="row" style="margin-top: 10px;">
+              <button type="button" class="secondary" onclick="addChoice('${section.id}')">선택지 추가</button>
+              <button type="button" class="ghost" onclick="bulkChoices('${section.id}')">선택지 대량 붙여넣기</button>
+              ${editingSections.length > 1 ? `<button type="button" class="danger" onclick="removeSection('${section.id}')">항목 삭제</button>` : ""}
+            </div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    window.updateSection = (id, key, value) => {
+      const section = editingSections.find((item) => item.id === id);
+      section[key] = value;
+    };
+
+    window.updateChoice = (id, index, value) => {
+      const section = editingSections.find((item) => item.id === id);
+      section.choices[index] = value;
+    };
+
+    window.addChoice = (id) => {
+      const section = editingSections.find((item) => item.id === id);
+      section.choices.push(`선택지 ${section.choices.length + 1}`);
+      renderSectionEditor();
+    };
+
+    window.bulkChoices = (id) => {
+      const section = editingSections.find((item) => item.id === id);
+      const pasted = prompt("선택지를 한 줄에 하나씩 붙여넣으세요.", section.choices.join("\n"));
+      if (pasted === null) return;
+      const choices = pasted.split(/\r?\n|,/).map((line) => line.trim()).filter(Boolean);
+      if (!choices.length) return alert("선택지는 최소 1개 이상 필요합니다.");
+      section.choices = choices;
+      renderSectionEditor();
+    };
+
+    window.removeChoice = (id, index) => {
+      const section = editingSections.find((item) => item.id === id);
+      if (section.choices.length <= 1) return alert("선택지는 최소 1개 이상 필요합니다.");
+      section.choices.splice(index, 1);
+      renderSectionEditor();
+    };
+
+    window.removeSection = (id) => {
+      editingSections = editingSections.filter((item) => item.id !== id);
+      renderSectionEditor();
+    };
+
+    window.startVote = (id) => {
+      activeElectionId = id;
+      const election = state.elections.find((item) => item.id === id);
+      if (!election) return;
+      if (location.hash !== `#vote=${encodeURIComponent(id)}`) {
+        location.hash = `vote=${encodeURIComponent(id)}`;
+      }
+      $("#voteTitle").textContent = election.title;
+      $("#voteMeta").textContent = `${formatDate(election.startAt)} ~ ${formatDate(election.endAt)} · ${election.identityMode === "anonymous" ? "무기명" : "유기명"} 투표 · ${electionStatus(election).label}`;
+      renderVoteForm(election);
+      showView("vote");
+    };
+
+    function renderVoteForm(election) {
+      const tokenField = election.repeatMode === "blocked" ? `
+        <label class="full">투표권 코드
+          <input id="voterToken" required placeholder="관리자에게 받은 투표권 코드를 입력하세요." />
+        </label>
+      ` : "";
+      const nameField = election.identityMode === "named" ? `
+        <label class="full">이름
+          <input id="voterName" required placeholder="이름을 입력하세요." />
+        </label>
+      ` : "";
+
+      $("#voteForm").innerHTML = `
+        <div class="notice">
+          ${election.identityMode === "anonymous"
+            ? "이 투표는 무기명입니다. 투표권 코드는 참여 여부와 중복투표 확인에만 사용되며, 선택한 내용과 함께 저장되지 않습니다."
+            : "이 투표는 유기명입니다. 입력한 이름은 결과 확인용으로 저장됩니다."}
+          ${election.repeatMode === "blocked" ? " 같은 투표권 코드는 한 번만 사용할 수 있습니다." : " 중복투표가 허용된 투표입니다."}
+        </div>
+        <div class="fields">${nameField}${tokenField}</div>
+        ${election.sections.map((section) => `
+          <div class="section-box">
+            <h3>${escapeHtml(section.title)}</h3>
+            <p class="muted">${section.multiple ? "여러 개 선택할 수 있습니다." : "하나만 선택하세요."}</p>
+            <div class="choice-list">
+              ${section.choices.map((choice) => `
+                <label class="choice-option">
+                  <input type="${section.multiple ? "checkbox" : "radio"}" name="${section.id}" value="${escapeAttr(choice)}" />
+                  <span>${escapeHtml(choice)}</span>
+                </label>
+              `).join("")}
+            </div>
+          </div>
+        `).join("")}
+        <div class="row" style="margin-top: 18px;">
+          <button type="submit">투표 제출</button>
+        </div>
+      `;
+    }
+
+    async function submitVote(event) {
+      event.preventDefault();
+      const election = state.elections.find((item) => item.id === activeElectionId);
+      if (!election) return;
+      if (!isOpen(election)) return alert("현재 투표 가능한 시간이 아닙니다.");
+
+      const token = election.repeatMode === "blocked" ? $("#voterToken").value.trim() : "";
+      const voterName = election.identityMode === "named" ? $("#voterName").value.trim() : "";
+      const answers = [];
+      for (const section of election.sections) {
+        const checked = $$(`input[name="${section.id}"]:checked`).map((input) => input.value);
+        if (!checked.length) return alert(`'${section.title}' 항목을 선택하세요.`);
+        answers.push({ sectionId: section.id, choices: checked });
+      }
+
+      if (location.protocol !== "file:") {
+        const response = await fetch(`/api/public/election/${encodeURIComponent(election.id)}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token, voterName, answers })
+        });
+        if (!response.ok) {
+          const message = {
+            400: "선택 항목을 다시 확인하세요.",
+            403: "등록되지 않은 투표권 코드입니다.",
+            409: "이미 사용된 코드이거나 투표 가능 시간이 아닙니다."
+          }[response.status] || "투표 제출에 실패했습니다.";
+          return alert(message);
+        }
+        await loadServerState();
+        alert("투표가 제출되었습니다.");
+        showView("home");
+        return;
+      }
+
+      if (election.repeatMode === "blocked") {
+        const tokenHash = await digest(token);
+        const tokenRecord = election.tokens.find((item) => item.hash === tokenHash);
+        if (!tokenRecord) return alert("등록되지 않은 투표권 코드입니다.");
+        if (tokenRecord.used) return alert("이미 사용된 투표권 코드입니다.");
+        tokenRecord.used = true;
+        tokenRecord.usedAt = new Date().toISOString();
+      }
+
+      election.ballots.push({
+        id: uid("ballot"),
+        submittedAt: new Date().toISOString(),
+        voterName,
+        answers
+      });
+      saveState();
+      alert("투표가 제출되었습니다.");
+      showView("home");
+    }
+
+    function renderResults(selectedId) {
+      const select = $("#resultSelect");
+      if (!state.elections.length) {
+        select.innerHTML = "";
+        $("#resultContent").innerHTML = `<div class="notice">아직 결과를 볼 투표가 없습니다.</div>`;
+        return;
+      }
+      const chosenId = selectedId || select.value || state.elections[0].id;
+      select.innerHTML = state.elections.map((election) => `<option value="${election.id}" ${election.id === chosenId ? "selected" : ""}>${escapeHtml(election.title)}</option>`).join("");
+      const election = state.elections.find((item) => item.id === chosenId) || state.elections[0];
+      $("#resultContent").innerHTML = resultHtml(election);
+    }
+
+    function resultHtml(election) {
+      const ballots = election.ballots || [];
+      const total = ballots.length;
+      const sections = election.sections.map((section) => {
+        const counts = Object.fromEntries(section.choices.map((choice) => [choice, 0]));
+        ballots.forEach((ballot) => {
+          const answer = ballot.answers.find((item) => item.sectionId === section.id);
+          if (!answer) return;
+          answer.choices.forEach((choice) => counts[choice] = (counts[choice] || 0) + 1);
+        });
+        const rows = Object.entries(counts)
+          .sort((a, b) => b[1] - a[1])
+          .map(([choice, count], index) => {
+            const percent = total ? Math.round((count / total) * 100) : 0;
+            return `
+              <tr>
+                <td>${index + 1}</td>
+                <td>${escapeHtml(choice)}</td>
+                <td>${count}</td>
+                <td>${percent}%</td>
+                <td><div class="bar"><span style="width: ${percent}%"></span></div></td>
+              </tr>
+            `;
+          }).join("");
+        return `
+          <div class="section-box">
+            <h3>${escapeHtml(section.title)}</h3>
+            <table class="results-table">
+              <thead><tr><th>순위</th><th>선택지</th><th>득표수</th><th>득표율</th><th>그래프</th></tr></thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        `;
+      }).join("");
+
+      const namedRows = election.identityMode === "named" ? `
+        <div class="section-box">
+          <h3>유기명 참여자</h3>
+          <table class="results-table">
+            <thead><tr><th>이름</th><th>제출 일시</th></tr></thead>
+            <tbody>
+              ${ballots.map((ballot) => `<tr><td>${escapeHtml(ballot.voterName || "-")}</td><td>${formatDate(ballot.submittedAt)}</td></tr>`).join("")}
+            </tbody>
+          </table>
+        </div>
+      ` : "";
+
+      const participationRows = election.repeatMode === "blocked" && (election.tokens || []).some((token) => token.label) ? `
+        <div class="section-box">
+          <h3>참여 여부 확인</h3>
+          <table class="results-table">
+            <thead><tr><th>번호</th><th>투표권 코드</th><th>상태</th><th>사용 일시</th></tr></thead>
+            <tbody>
+              ${election.tokens.map((token, index) => `
+                <tr>
+                  <td>${index + 1}</td>
+                  <td>${escapeHtml(token.label || "-")}</td>
+                  <td>${token.used ? "참여" : "미참여"}</td>
+                  <td>${token.usedAt ? formatDate(token.usedAt) : "-"}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+          <p class="muted">참여 여부 확인표는 투표권 사용 여부만 보여주며, 선택한 투표 내용과는 연결되어 저장되지 않습니다.</p>
+        </div>
+      ` : "";
+
+      return `
+        <h3>${escapeHtml(election.title)}</h3>
+        <p class="muted">${formatDate(election.startAt)} ~ ${formatDate(election.endAt)}</p>
+        <div class="notice ${isOpen(election) ? "" : "warning"}">
+          결과 상태: ${isOpen(election) ? "진행 중인 투표입니다. 최종 결과는 투표 종료 후 확정하세요." : "투표 기간이 종료되어 결과 확인 및 출력이 가능합니다."}
+        </div>
+        <div class="grid">
+          <div class="item"><strong>총 투표수</strong><p>${total}표</p></div>
+          <div class="item"><strong>투표 방식</strong><p>${election.identityMode === "anonymous" ? "무기명" : "유기명"}</p></div>
+        </div>
+        ${sections}
+        ${namedRows}
+        ${participationRows}
+      `;
+    }
+
+    window.openResults = (id) => {
+      location.hash = `results=${encodeURIComponent(id)}`;
+      showView("results");
+      renderResults(id);
+    };
+
+    window.editElection = (id) => {
+      const election = state.elections.find((item) => item.id === id);
+      if (!election) return;
+      if ((election.ballots || []).length > 0) {
+        return alert("이미 투표가 제출된 투표는 결과 보호를 위해 수정할 수 없습니다. 새 투표로 복제해 운영하세요.");
+      }
+      editingElectionId = id;
+      $("#titleInput").value = election.title;
+      $("#startInput").value = election.startAt;
+      $("#endInput").value = election.endAt;
+      $("#identityMode").value = election.identityMode;
+      $("#repeatMode").value = election.repeatMode;
+      $("#tokenLabelMode").value = election.tokenLabelMode || "keep";
+      $("#tokenInput").value = (election.tokens || []).map((token) => token.label).filter(Boolean).join("\n");
+      editingSections = election.sections.map((section) => ({
+        id: section.id,
+        title: section.title,
+        multiple: section.multiple,
+        choices: [...section.choices]
+      }));
+      renderAdmin();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    };
+
+    function cancelEdit() {
+      editingElectionId = null;
+      $("#electionForm").reset();
+      editingSections = [newSection()];
+      renderAdmin();
+    }
+
+    window.copyShareLink = async (id) => {
+      const link = makeShareUrl(id);
+      try {
+        await navigator.clipboard.writeText(link);
+        alert("공유 링크를 복사했습니다.");
+      } catch {
+        prompt("공유 링크를 복사하세요.", link);
+      }
+    };
+
+    window.deleteElection = (id) => {
+      if (!confirm("이 투표와 결과를 삭제할까요?")) return;
+      state.elections = state.elections.filter((item) => item.id !== id);
+      saveState();
+      renderHome();
+      renderAdmin();
+      renderResults();
+    };
+
+    function exportSelectedResultCsv() {
+      const id = $("#resultSelect").value;
+      const election = state.elections.find((item) => item.id === id);
+      if (!election) return alert("저장할 결과가 없습니다.");
+      const rows = [
+        ["투표 제목", election.title],
+        ["투표 기간", `${formatDate(election.startAt)} ~ ${formatDate(election.endAt)}`],
+        ["투표 방식", election.identityMode === "anonymous" ? "무기명" : "유기명"],
+        ["총 투표수", (election.ballots || []).length],
+        []
+      ];
+
+      for (const section of election.sections) {
+        const counts = Object.fromEntries(section.choices.map((choice) => [choice, 0]));
+        (election.ballots || []).forEach((ballot) => {
+          const answer = ballot.answers.find((item) => item.sectionId === section.id);
+          if (!answer) return;
+          answer.choices.forEach((choice) => counts[choice] = (counts[choice] || 0) + 1);
+        });
+        rows.push([section.title]);
+        rows.push(["순위", "선택지", "득표수", "득표율"]);
+        Object.entries(counts)
+          .sort((a, b) => b[1] - a[1])
+          .forEach(([choice, count], index) => {
+            const percent = (election.ballots || []).length ? Math.round((count / (election.ballots || []).length) * 100) : 0;
+            rows.push([index + 1, choice, count, `${percent}%`]);
+          });
+        rows.push([]);
+      }
+
+      if (election.identityMode === "named") {
+        rows.push(["유기명 참여자"]);
+        rows.push(["이름", "제출 일시"]);
+        (election.ballots || []).forEach((ballot) => rows.push([ballot.voterName || "-", formatDate(ballot.submittedAt)]));
+      }
+      if (election.repeatMode === "blocked" && (election.tokens || []).some((token) => token.label)) {
+        rows.push([]);
+        rows.push(["참여 여부 확인"]);
+        rows.push(["번호", "투표권 코드", "상태", "사용 일시"]);
+        election.tokens.forEach((token, index) => {
+          rows.push([index + 1, token.label || "-", token.used ? "참여" : "미참여", token.usedAt ? formatDate(token.usedAt) : "-"]);
+        });
+      }
+
+      const csv = rows.map((row) => row.map(csvCell).join(",")).join("\n");
+      downloadText(`${election.title}_결과.csv`, csv, "text/csv;charset=utf-8");
+    }
+
+    function routeFromHash() {
+      const hash = location.hash.slice(1);
+      if (!hash) return;
+      const [key, value] = hash.split("=");
+      const id = decodeURIComponent(value || "");
+      if (key === "vote" && state.elections.some((item) => item.id === id)) {
+        startVote(id);
+      }
+      if (key === "results" && state.elections.some((item) => item.id === id)) {
+        showView("results");
+        renderResults(id);
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[char]);
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value).replace(/`/g, "&#096;");
+    }
+
+    $("#electionForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const tokenLines = $("#tokenInput").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+      const keepTokenLabels = $("#tokenLabelMode").value === "keep";
+      const tokens = [];
+      for (const token of tokenLines) {
+        const record = { hash: await digest(token), used: false };
+        if (keepTokenLabels) record.label = token;
+        tokens.push(record);
+      }
+
+      const cleanSections = editingSections.map((section) => ({
+        ...section,
+        title: section.title.trim() || "투표 항목",
+        choices: section.choices.map((choice) => choice.trim()).filter(Boolean)
+      }));
+      if (cleanSections.some((section) => !section.choices.length)) {
+        return alert("각 항목에는 선택지가 최소 1개 필요합니다.");
+      }
+
+      const election = {
+        id: uid("election"),
+        title: $("#titleInput").value.trim(),
+        startAt: $("#startInput").value,
+        endAt: $("#endInput").value,
+        identityMode: $("#identityMode").value,
+        repeatMode: $("#repeatMode").value,
+        tokenLabelMode: $("#tokenLabelMode").value,
+        sections: cleanSections,
+        tokens,
+        ballots: []
+      };
+
+      if (new Date(election.startAt) >= new Date(election.endAt)) {
+        return alert("종료 일시는 시작 일시보다 늦어야 합니다.");
+      }
+      if (election.repeatMode === "blocked" && !tokens.length) {
+        return alert("중복투표를 불허하려면 투표권 코드를 1개 이상 입력하세요.");
+      }
+
+      if (editingElectionId) {
+        const index = state.elections.findIndex((item) => item.id === editingElectionId);
+        if (index === -1) return alert("수정할 투표를 찾을 수 없습니다.");
+        if (state.elections[index].ballots.length > 0) return alert("이미 투표가 제출된 투표는 수정할 수 없습니다.");
+        election.id = editingElectionId;
+        state.elections[index] = election;
+        editingElectionId = null;
+      } else {
+        state.elections.unshift(election);
+      }
+      saveState();
+      event.target.reset();
+      editingSections = [newSection()];
+      renderAdmin();
+      renderHome();
+      renderResults(election.id);
+      alert("투표가 저장되었습니다.");
+    });
+
+    $("#voteForm").addEventListener("submit", submitVote);
+    $("#adminLoginBtn").addEventListener("click", async () => {
+      const password = $("#adminPasswordInput").value;
+      if (location.protocol !== "file:") {
+        const response = await fetch("/api/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password })
+        });
+        if (!response.ok) return alert("관리자 비밀번호가 맞지 않습니다.");
+        adminPasswordSession = password;
+        sessionStorage.setItem("jbotAdminPasswordSession", password);
+      } else if (password !== getAdminPassword()) {
+        return alert("관리자 비밀번호가 맞지 않습니다.");
+      }
+      adminUnlocked = true;
+      sessionStorage.setItem("jbotAdminUnlocked", "true");
+      $("#adminPasswordInput").value = "";
+      await loadServerState();
+      renderAdmin();
+    });
+    $("#adminPasswordInput").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") $("#adminLoginBtn").click();
+    });
+    $("#changePasswordBtn").addEventListener("click", () => {
+      if (location.protocol !== "file:") {
+        return alert("서버형 버전의 관리자 비밀번호는 서버 실행 환경에서 ADMIN_PASSWORD로 설정합니다.");
+      }
+      const current = $("#currentAdminPassword").value;
+      const next = $("#newAdminPassword").value;
+      if (current !== getAdminPassword()) return alert("현재 비밀번호가 맞지 않습니다.");
+      if (next.trim().length < 4) return alert("새 비밀번호는 4자 이상으로 입력하세요.");
+      localStorage.setItem(ADMIN_PASSWORD_KEY, next);
+      $("#currentAdminPassword").value = "";
+      $("#newAdminPassword").value = "";
+      alert("관리자 비밀번호를 변경했습니다.");
+    });
+    $("#addSectionBtn").addEventListener("click", () => {
+      editingSections.push(newSection());
+      renderSectionEditor();
+    });
+    $("#generateTokensBtn").addEventListener("click", () => {
+      const count = Math.max(1, Math.min(500, Number($("#tokenCountInput").value) || 50));
+      const prefix = ($("#tokenPrefixInput").value || "JBOT").trim().replace(/\s+/g, "").slice(0, 12) || "JBOT";
+      const tokens = new Set();
+      while (tokens.size < count) {
+        tokens.add(randomToken(prefix));
+      }
+      $("#tokenInput").value = Array.from(tokens).join("\n");
+      alert(`${count}개의 투표권 코드를 생성했습니다. 코드 명단 저장 버튼으로 배부용 파일을 저장할 수 있습니다.`);
+    });
+    $("#downloadTokensBtn").addEventListener("click", () => {
+      const tokens = $("#tokenInput").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+      if (!tokens.length) return alert("저장할 투표권 코드가 없습니다.");
+      const csv = [["번호", "투표권 코드"], ...tokens.map((token, index) => [index + 1, token])]
+        .map((row) => row.map(csvCell).join(","))
+        .join("\n");
+      downloadText("JBOT_투표권_코드명단.csv", csv, "text/csv;charset=utf-8");
+    });
+    $("#importTokensBtn").addEventListener("click", () => $("#tokenFileInput").click());
+    $("#tokenFileInput").addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const rows = String(reader.result)
+          .split(/\r?\n/)
+          .map((line) => line.split(",").map((cell) => cell.trim().replace(/^"|"$/g, "")))
+          .filter((cells) => cells.some(Boolean));
+        const tokens = rows
+          .map((cells) => cells.length > 1 && /^\d+$/.test(cells[0]) ? cells[1] : cells[0])
+          .map((cell) => cell.trim())
+          .filter((cell) => cell && cell !== "투표권 코드");
+        if (!tokens.length) return alert("불러올 투표권 코드가 없습니다.");
+        $("#tokenInput").value = tokens.join("\n");
+        alert(`${tokens.length}개의 투표권 코드를 불러왔습니다.`);
+        event.target.value = "";
+      };
+      reader.readAsText(file, "utf-8");
+    });
+    $("#cancelEditBtn").addEventListener("click", cancelEdit);
+    $("#resetBtn").addEventListener("click", () => {
+      if (!confirm("저장된 모든 투표와 결과를 초기화할까요?")) return;
+      state = { elections: [] };
+      editingElectionId = null;
+      editingSections = [newSection()];
+      saveState();
+      renderAdmin();
+      renderHome();
+      renderResults();
+    });
+    $("#resultSelect").addEventListener("change", (event) => renderResults(event.target.value));
+    $("#csvBtn").addEventListener("click", exportSelectedResultCsv);
+    $("#printBtn").addEventListener("click", () => window.print());
+    $("#backupBtn").addEventListener("click", () => {
+      downloadText(`JBOT_전자투표_백업_${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(state, null, 2), "application/json;charset=utf-8");
+    });
+    $("#restoreBtn").addEventListener("click", () => $("#restoreInput").click());
+    $("#restoreInput").addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const restored = JSON.parse(reader.result);
+          if (!restored || !Array.isArray(restored.elections)) throw new Error("invalid");
+          if (!confirm("현재 저장된 투표 데이터를 백업 파일 내용으로 바꿀까요?")) return;
+          state = restored;
+          saveState();
+          renderHome();
+          renderAdmin();
+          renderResults();
+          alert("백업을 불러왔습니다.");
+        } catch {
+          alert("올바른 JBOT 전자투표 백업 파일이 아닙니다.");
+        } finally {
+          event.target.value = "";
+        }
+      };
+      reader.readAsText(file, "utf-8");
+    });
+    $("#seedDemoBtn").addEventListener("click", async () => {
+      const now = new Date();
+      const end = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const tokens = [];
+      for (const token of ["A101", "A102", "A103", "A104", "A105"]) {
+        tokens.push({ hash: await digest(token), label: token, used: false });
+      }
+      state.elections.unshift({
+        id: uid("election"),
+        title: "2026 학생자치회 의견 수렴",
+        startAt: now.toISOString().slice(0, 16),
+        endAt: end.toISOString().slice(0, 16),
+        identityMode: "anonymous",
+        repeatMode: "blocked",
+        tokenLabelMode: "keep",
+        sections: [
+          { id: uid("section"), title: "가장 우선하면 좋을 학교생활 개선안", multiple: false, choices: ["급식 만족도 개선", "체육활동 확대", "자습 공간 개선"] },
+          { id: uid("section"), title: "함께 추진하면 좋은 행사", multiple: true, choices: ["학급 대항전", "진로 체험 부스", "작은 음악회"] }
+        ],
+        tokens,
+        ballots: []
+      });
+      saveState();
+      renderHome();
+      renderResults();
+    });
+
+    $$("[data-view]").forEach((button) => {
+      button.addEventListener("click", () => showView(button.dataset.view));
+    });
+
+    renderHome();
+    renderAdmin();
+    renderResults();
+    routeFromHash();
+    loadServerState();
+    window.addEventListener("hashchange", routeFromHash);
+  </script>
+</body>
+</html>

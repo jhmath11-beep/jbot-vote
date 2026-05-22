@@ -1,0 +1,12 @@
+{
+  "name": "jbot-school-vote",
+  "version": "0.1.0",
+  "private": true,
+  "description": "JBOT school voting system prototype server",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
