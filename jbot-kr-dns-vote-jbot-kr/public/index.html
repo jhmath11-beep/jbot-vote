@@ -569,7 +569,7 @@
         <div class="mark">J</div>
         <div>
           <strong>JBOT 학교 전자투표</strong>
-          <span>vote.jbot.kr 운영 초안</span>
+          <span>vote.jbot.kr</span>
         </div>
       </div>
       <nav>
@@ -589,12 +589,12 @@
         <div class="status-panel panel">
           <div class="stat"><span>전체 투표</span><strong id="statTotal">0개</strong></div>
           <div class="stat"><span>진행 중</span><strong id="statOpen">0개</strong></div>
-          <div class="stat"><span>저장 방식</span><strong id="storageMode">서버 파일 저장</strong></div>
+          <div class="stat"><span>운영 방식</span><strong id="storageMode">온라인 운영</strong></div>
         </div>
       </div>
 
-      <div class="notice warning">
-        이 첫 버전은 화면과 업무 흐름을 확인하기 위한 시제품입니다. 실제 운영 시에는 서버, 관리자 로그인, HTTPS, 백업, 개인정보 처리 방침을 붙여야 합니다.
+      <div class="notice">
+        학교 구성원이 투표 링크로 참여하고, 관리자는 투표 생성부터 결과 확인과 출력까지 한 화면에서 진행할 수 있습니다.
       </div>
 
       <div class="panel">
@@ -609,7 +609,7 @@
     <section id="admin" class="section">
       <div id="adminLock" class="panel locked">
         <h2>관리자 확인</h2>
-        <p class="muted">시제품용 간단 잠금입니다. 실제 서버형에서는 관리자 계정 로그인으로 바꿔야 합니다.</p>
+        <p class="muted">관리자 비밀번호를 입력하면 투표 생성, 관리, 결과 확인 기능을 사용할 수 있습니다.</p>
         <div class="fields" style="margin-top: 14px;">
           <label>관리자 비밀번호
             <input id="adminPasswordInput" type="password" placeholder="초기 비밀번호: jbot2026" />
@@ -794,7 +794,7 @@
         renderResults();
         routeFromHash();
       } catch {
-        console.warn("서버 데이터를 불러오지 못했습니다. 브라우저 임시 데이터를 사용합니다.");
+        console.warn("온라인 데이터를 불러오지 못해 로컬 데이터를 사용합니다.");
       }
     }
 
@@ -889,7 +889,7 @@
     function renderHome() {
       $("#statTotal").textContent = `${state.elections.length}개`;
       $("#statOpen").textContent = `${state.elections.filter(isOpen).length}개`;
-      $("#storageMode").textContent = location.protocol === "file:" ? "브라우저 임시 저장" : "서버 파일 저장";
+      $("#storageMode").textContent = location.protocol === "file:" ? "로컬 확인" : "온라인 운영";
       $("#seedDemoBtn").style.display = location.protocol === "file:" || adminUnlocked ? "inline-flex" : "none";
       const list = $("#electionList");
       const openElections = state.elections.filter(isOpen);
