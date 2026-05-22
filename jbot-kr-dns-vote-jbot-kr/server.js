@@ -81,7 +81,12 @@ function hashText(text) {
 
 function isOpen(election) {
   const now = Date.now();
-  return now >= new Date(election.startAt).getTime() && now <= new Date(election.endAt).getTime();
+  return now >= parseKoreaDateTime(election.startAt).getTime() && now <= parseKoreaDateTime(election.endAt).getTime();
+}
+
+function parseKoreaDateTime(value) {
+  if (!value || value.includes("Z") || /[+-]\d\d:\d\d$/.test(value)) return new Date(value);
+  return new Date(`${value}:00+09:00`);
 }
 
 function makePublicElection(election) {
@@ -216,6 +221,10 @@ async function handleApi(req, res) {
         return json(res, 400, { ok: false, error: "missing answer" });
       }
       if (!section.multiple && answer.choices.length > 1) {
+        return json(res, 400, { ok: false, error: "too many choices" });
+      }
+      const maxChoices = section.multiple ? Number(section.maxChoices || section.choices.length) : 1;
+      if (answer.choices.length > maxChoices) {
         return json(res, 400, { ok: false, error: "too many choices" });
       }
       const allowed = new Set(section.choices || []);
